@@ -293,18 +293,7 @@
         <form id="proposalForm">
             <!-- BASIC INFORMATION -->
             <div class="section-title">📋 Basic Information</div>
-            <div class="row">
-                <div class="form-group">
-                    <label for="docRef">Document Ref. No. <span class="required">*</span></label>
-                    <input type="text" id="docRef" placeholder="e.g., EFA-PROP-2025-001" required>
-                </div>
-
-  <div class="form-group">
-    <label for="revision">Revision <span class="required">*</span></label>
-    <input type="text" id="revision" placeholder="e.g., Rev A" required>
-  </div>
-</div>
-
+            
             <div class="row">
                 <div class="form-group">
                     <label for="name">Name and Surname <span class="required">*</span></label>
@@ -602,184 +591,228 @@
 
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
     try {
-        // Load logo image (must be square/circular PNG for proper circle appearance)
+        // Load logo image
         const logoBase64 = await getBase64Image("./efa_logo.png");
 
         const doc = new Document({
             sections: [{
-                properties: {
-                    page: {
-                        margin: { top: 720, right: 1080, bottom: 720, left: 1080 },
-                    },
-                },
-                children: [
-                    // --- Logo top-right ---
-                    new Paragraph({
-                        children: [
-                            new docx.ImageRun({
-                                data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-                                transformation: { width: 120, height: 120 },
-                            }),
-                        ],
-                        alignment: AlignmentType.RIGHT,
-                    }),
-                    new Paragraph({ text: "" }), // spacing
-
-                    // --- Header Table ---
-                    new Table({
-                        width: { size: 100, type: WidthType.PERCENTAGE },
-                        borders: {
-                            top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                            bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                            left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                            right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                            insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                            insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                        properties: {
+                            page: {
+                                margin: {
+                                    top: 720,
+                                    right: 1080,
+                                    bottom: 720,
+                                    left: 1080,
+                                },
+                            },
                         },
-                        rows: [
-                            new TableRow({
-                                children: [
-                                    new TableCell({ width: { size: 30, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "Document Ref. No.", font: "Aptos" })] }),
-                                    new TableCell({ width: { size: 70, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "" })] }),
-                                ],
-                            }),
-                            new TableRow({
-                                children: [
-                                    new TableCell({ children: [new Paragraph({ text: "Revision", font: "Aptos" })] }),
-                                    new TableCell({ children: [new Paragraph({ text: "" })] }),
-                                ],
-                            }),
-                            new TableRow({
-                                children: [
-                                    new TableCell({ children: [new Paragraph({ text: "Date", font: "Aptos" })] }),
-                                    new TableCell({ children: [new Paragraph({ text: "" })] }),
-                                ],
-                            }),
+children: [
+    // --- Logo at top-right ---
+    new Paragraph({
+    children: [
+        new docx.ImageRun({
+            data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+            transformation: { width: 140, height: 80 }, // Adjust size as needed
+        }),
+    ],
+    alignment: AlignmentType.RIGHT,
+}),
+
+    new Paragraph({ text: "" }), // spacing
+
+    // --- Header Table ---
+    new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+            top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        },
+        rows: [
+            new TableRow({
+                children: [
+                    new TableCell({
+                        width: { size: 30, type: WidthType.PERCENTAGE },
+                        children: [new Paragraph({ text: "Document Ref. No." })],
+                    }),
+                    new TableCell({
+                        width: { size: 70, type: WidthType.PERCENTAGE },
+                        children: [new Paragraph({ text: "" })],
+                    }),
+                ],
+            }),
+            new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ text: "Revision" })] }),
+                    new TableCell({ children: [new Paragraph({ text: "" })] }),
+                ],
+            }),
+            new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ text: "Date" })] }),
+                    new TableCell({ children: [new Paragraph({ text: "" })] }),
+                ],
+            }),
+        ],
+    }),
+
+    new Paragraph({ text: "" }), // spacing
+
+    new Paragraph({ text: "Private and Confidential", alignment: AlignmentType.RIGHT }),
+    new Paragraph({ text: "" }),
+    new Paragraph({ text: `FAO: ${formData.name}` }),
+    new Paragraph({ text: formData.department }),
+    new Paragraph({ text: formData.company }),
+    new Paragraph({ text: "" }),
+    new Paragraph({ text: formData.date }),
+    new Paragraph({ text: "" }),
+    new Paragraph({ text: "Private and Confidential" }),
+    new Paragraph({ text: "" }),
+    new Paragraph({ text: `Dear ${formData.name},` }),
+    new Paragraph({ text: "" }),
+
+    new Paragraph({ children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true })] }),
+    new Paragraph({ text: "" }),
+
+    // --- Content Box 1 ---
+    new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+            top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        },
+        rows: [
+            new TableRow({
+                children: [
+                    new TableCell({
+                        children: [
+                            new Paragraph({ text: formData.generalInfo }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: `Our price for the work is £${formData.finalPrice.toFixed(2)} (${priceInWords}). Excluding VAT.` }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: pricingText }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: "Please see full details of scope and deliverables on the following pages:" }),
                         ],
                     }),
+                ],
+            }),
+        ],
+    }),
 
-                    new Paragraph({ text: "" }),
+    new Paragraph({ text: "" }),
 
-                    new Paragraph({ text: "Private and Confidential", alignment: AlignmentType.RIGHT, children: [new TextRun({ font: "Arial" })] }),
-                    new Paragraph({ text: "" }),
-                    new Paragraph({ text: `FAO: ${formData.name}`, children: [new TextRun({ font: "Aptos" })] }),
-                    new Paragraph({ text: formData.department, children: [new TextRun({ font: "Aptos" })] }),
-                    new Paragraph({ text: formData.company, children: [new TextRun({ font: "Aptos" })] }),
-                    new Paragraph({ text: "" }),
-                    new Paragraph({ text: formData.date, children: [new TextRun({ font: "Aptos" })] }),
-                    new Paragraph({ text: "" }),
-                    new Paragraph({ text: `Dear ${formData.name},`, children: [new TextRun({ font: "Aptos" })] }),
-                    new Paragraph({ text: "" }),
-
-                    new Paragraph({ children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true, font: "Aptos" })] }),
-                    new Paragraph({ text: "" }),
-
-                    // --- Content Box 1 ---
-                    new Table({
-                        width: { size: 100, type: WidthType.PERCENTAGE },
-                        borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } },
-                        rows: [
-                            new TableRow({
-                                children: [
-                                    new TableCell({
-                                        children: [
-                                            ...formData.generalInfo.split('\n').map(line => new Paragraph({ text: line, font: "Aptos" })),
-                                            new Paragraph({ text: `Our price for the work is £${formData.finalPrice.toFixed(2)} (${priceInWords}). Excluding VAT.`, font: "Aptos" }),
-                                            new Paragraph({ text: pricingText, font: "Aptos" }),
-                                            new Paragraph({ text: "Please see full details of scope and deliverables on the following pages:", font: "Aptos" }),
-                                        ],
-                                    }),
-                                ],
-                            }),
+    // --- Content Box 2 ---
+    new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+            top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        },
+        rows: [
+            new TableRow({
+                children: [
+                    new TableCell({
+                        children: [
+                            new Paragraph({ text: formData.detailedInfo }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ children: [new TextRun({ text: "Scope", bold: true })] }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: formData.scope }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true })] }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: formData.deliverables }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ children: [new TextRun({ text: "Resources", bold: true })] }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: formData.resources }),
                         ],
                     }),
+                ],
+            }),
+        ],
+    }),
 
-                    new Paragraph({ text: "" }),
+    new Paragraph({ text: "" }),
 
-                    // --- Content Box 2 ---
-                    new Table({
-                        width: { size: 100, type: WidthType.PERCENTAGE },
-                        borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } },
-                        rows: [
-                            new TableRow({
-                                children: [
-                                    new TableCell({
-                                        children: [
-                                            ...formData.detailedInfo.split('\n').map(line => new Paragraph({ text: line, font: "Aptos" })),
-                                            new Paragraph({ text: "", font: "Aptos" }),
-                                            new Paragraph({ children: [new TextRun({ text: "Scope", bold: true, font: "Aptos" })] }),
-                                            ...formData.scope.split('\n').map(line => new Paragraph({ text: line, font: "Aptos" })),
-                                            new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true, font: "Aptos" })] }),
-                                            ...formData.deliverables.split('\n').map(line => new Paragraph({ text: line, font: "Aptos" })),
-                                            new Paragraph({ children: [new TextRun({ text: "Resources", bold: true, font: "Aptos" })] }),
-                                            ...formData.resources.split('\n').map(line => new Paragraph({ text: line, font: "Aptos" })),
-                                        ],
-                                    }),
-                                ],
-                            }),
+    // --- Duration Box ---
+    new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+            top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        },
+        rows: [
+            new TableRow({
+                children: [
+                    new TableCell({
+                        children: [
+                            new Paragraph({ children: [new TextRun({ text: "DURATION", bold: true })] }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: `The duration of the work is ${formData.duration}, commencing on ${formData.startDate} and concluding on ${formData.endDate}. The project will be billed periodically with the payment application being supported by an up-to-date delivery programme.` }),
                         ],
                     }),
+                ],
+            }),
+        ],
+    }),
 
-                    new Paragraph({ text: "" }),
+    new Paragraph({ text: "" }),
 
-                    // --- Duration Box ---
-                    new Table({
-                        width: { size: 100, type: WidthType.PERCENTAGE },
-                        borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } },
-                        rows: [
-                            new TableRow({
-                                children: [
-                                    new TableCell({
-                                        children: [
-                                            new Paragraph({ children: [new TextRun({ text: "DURATION", bold: true, font: "Aptos" })] }),
-                                            new Paragraph({ text: `The duration of the work is ${formData.duration}, commencing on ${formData.startDate} and concluding on ${formData.endDate}.`, font: "Aptos" }),
-                                        ],
-                                    }),
-                                ],
-                            }),
+    // --- Commercial Box ---
+    new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+            top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+            right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        },
+        rows: [
+            new TableRow({
+                children: [
+                    new TableCell({
+                        children: [
+                            new Paragraph({ text: formData.contractType }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: contractText }),
                         ],
                     }),
+                ],
+            }),
+        ],
+    }),
 
-                    new Paragraph({ text: "" }),
+    new Paragraph({ text: "" }),
+    new Paragraph({ text: "Yours sincerely," }),
+    new Paragraph({ text: "" }),
+    new Paragraph({ text: formData.name }),
+    new Paragraph({ text: formData.department }),
+    new Paragraph({ text: formData.company }),
+]
 
-                    // --- Commercial Box ---
-                    new Table({
-                        width: { size: 100, type: WidthType.PERCENTAGE },
-                        borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } },
-                        rows: [
-                            new TableRow({
-                                children: [
-                                    new TableCell({
-                                        children: [
-                                            new Paragraph({ text: formData.contractType, font: "Aptos" }),
-                                            new Paragraph({ text: contractText, font: "Aptos" }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                        ],
-                    }),
+                    }],
+                });
 
-                    new Paragraph({ text: "" }),
-                    new Paragraph({ text: "Yours sincerely,", font: "Aptos" }),
-                    new Paragraph({ text: "", font: "Aptos" }),
-                    new Paragraph({ text: formData.name, font: "Aptos" }),
-                    new Paragraph({ text: formData.department, font: "Aptos" }),
-                    new Paragraph({ text: formData.company, font: "Aptos" }),
-                ]
-            }]
-        });
-
-        const blob = await Packer.toBlob(doc);
-        saveAs(blob, `${formData.proposalTitle.replace(/\s+/g, '_')}_Proposal.docx`);
-    } catch (error) {
-        console.error("Error generating Word document:", error);
-        alert("❌ Something went wrong while generating the Word document. Please try again.");
-    } finally {
-        document.getElementById('loadingIndicator').classList.remove('active');
-    }
-}
-
+                const blob = await Packer.toBlob(doc);
+                saveAs(blob, `${formData.proposalTitle.replace(/\s+/g, '_')}_Proposal.docx`);
+            } catch (error) {
+                console.error("Error generating Word document:", error);
+                alert("❌ Something went wrong while generating the Word document. Please try again.");
+            } finally {
+                document.getElementById('loadingIndicator').classList.remove('active');
+            }
+        }
 
         // Handle form submission
         document.getElementById('proposalForm').addEventListener('submit', async function (e) {
