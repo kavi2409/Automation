@@ -580,9 +580,12 @@
         }
         
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
-            try {
-                const doc = new Document({
-                    sections: [{
+    try {
+        // Load logo image
+        const logoBase64 = await getBase64Image("efa_logo.png");
+
+        const doc = new Document({
+            sections: [{
                         properties: {
                             page: {
                                 margin: {
@@ -595,6 +598,16 @@
                         },
                         children: [
                             // Header Table
+                        new Paragraph({
+                        children: [
+                            new docx.ImageRun({
+                                data: Uint8Array.from(atob(logoBase64), (c) => c.charCodeAt(0)),
+                                transformation: { width: 120, height: 120 },
+                            }),
+                        ],
+                        alignment: docx.AlignmentType.RIGHT,
+                    }),
+                    new Paragraph({ text: "" }),
                             new Table({
                                 width: { size: 100, type: WidthType.PERCENTAGE },
                                 borders: {
