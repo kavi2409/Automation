@@ -592,7 +592,7 @@
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
     try {
         // Load logo image
-        const logoBase64 = await getBase64Image("efa_logo.png");
+        const logoBase64 = await getBase64Image("./efa_logo.png");
 
         const doc = new Document({
             sections: [{
