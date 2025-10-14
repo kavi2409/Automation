@@ -599,14 +599,14 @@
 children: [
     // --- Logo at top-right ---
     new Paragraph({
-        children: [
-            new docx.ImageRun({
-                data: Uint8Array.from(atob(logoBase64), (c) => c.charCodeAt(0)),
-                transformation: { width: 120, height: 120 },
-            }),
-        ],
-        alignment: AlignmentType.RIGHT,
-    }),
+    children: [
+        new docx.ImageRun({
+            data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+            transformation: { width: 120, height: 120 },
+        }),
+    ],
+    alignment: AlignmentType.RIGHT,
+}),
     new Paragraph({ text: "" }), // spacing
 
     // --- Header Table ---
