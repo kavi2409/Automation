@@ -5,6 +5,7 @@ Requires: python-docx library
 Install: pip install python-docx
 """
 
+from pydoc import doc
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -141,9 +142,13 @@ def create_proposal_document(data):
     run.font.size = Pt(10)
     
     doc.add_paragraph()  # Spacing
-    
+    doc = Document()
+
+# Add logo to the top of the Word document
+    doc.add_picture('efa_logo.png', width=Inches(1.5))
     # FAO section
     p = doc.add_paragraph()
+    
     run = p.add_run(f'FAO: {data["name"]}\n')
     run.font.size = Pt(11)
     run = p.add_run(f'{data["department"]}\n')
