@@ -589,46 +589,21 @@
             };
             return contracts[contractType] || '';
         }
-//         async function getBase64Image(url) {
-//             const response = await fetch(url);
-//             const blob = await response.blob();
-//         return new Promise((resolve, reject) => {
-//             const reader = new FileReader();
-//             reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract base64
-//             reader.onerror = reject;
-//             reader.readAsDataURL(blob);
-//         });
-// } 
-async function getBase64ImageCircular(url) {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve) => {
-    const img = new Image();
-    const reader = new FileReader();
-    reader.onload = () => {
-      img.onload = () => {
-        const size = Math.min(img.width, img.height);
-        const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext('2d');
-        ctx.beginPath();
-        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, size, size);
-        resolve(canvas.toDataURL().split(',')[1]);
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(blob);
-  });
+        async function getBase64Image(url) {
+            const response = await fetch(url);
+            const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]); // Extract base64
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
 }
 
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
     try {
         // Load logo image (must be square/circular PNG for proper circle appearance)
-        const logoBase64 = await getBase64ImageCircular("./efa_logo.png");
+        const logoBase64 = await getBase64Image("./efa_logo.png");
 
         const doc = new Document({
             sections: [{
@@ -639,48 +614,17 @@ async function getBase64ImageCircular(url) {
                 },
                 children: [
                     // --- Logo top-right ---
-                     // spacing
-                    new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
-    borders: { top: { style: BorderStyle.SINGLE, size: 4, color: "000000" } },
-    rows: [
-        new TableRow({
-            children: [
-                // Left: Reference Info Box (Compact)
-                new TableCell({
-                    width: { size: 60, type: WidthType.PERCENTAGE },
-                    borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
-                    children: [
-                        new Paragraph({ text: `Document Ref. No.: ${formData.docRef}`, font: "Aptos" }),
-                        new Paragraph({ text: `Date: ${formData.date}`, font: "Aptos" }),
-                        new Paragraph({ text: `Revision: ${formData.revision}`, font: "Aptos" }),
-                    ],
-                }),
-                // Right: Circular Logo
-                new TableCell({
-                    width: { size: 40, type: WidthType.PERCENTAGE },
-                    borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } },
-                    children: [
-                        new Paragraph({
-                            alignment: AlignmentType.RIGHT,
-                            children: [
-                                new docx.ImageRun({
-                                    data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-                                    transformation: { width: 90, height: 90 },
-                                }),
-                            ],
-                        }),
-                    ],
-                }),
-            ],
-        }),
-    ],
-}),
-// Line below header
-new Paragraph({
-    text: "_____________________________________________________________",
-    alignment: AlignmentType.CENTER,
-}),
+                    new Paragraph({
+                        children: [
+                            new docx.ImageRun({
+                                data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+                                transformation: { width: 120, height: 120 },
+                            }),
+                        ],
+                        alignment: AlignmentType.RIGHT,
+                    }),
+                    new Paragraph({ text: "" }), // spacing
+
                     // --- Header Table ---
                     new Table({
                         width: { size: 100, type: WidthType.PERCENTAGE },
@@ -764,10 +708,7 @@ new Paragraph({
                                             ...formData.detailedInfo.split('\n').map(line => new Paragraph({ text: line, font: "Aptos" })),
                                             new Paragraph({ text: "", font: "Aptos" }),
                                             new Paragraph({ children: [new TextRun({ text: "Scope", bold: true, font: "Aptos" })] }),
-                                            ...formData.scope.split('\n').filter(l => l.trim() !== "").map(line => 
-    new Paragraph({ text: line.trim(), spacing: { after: 200 } })
-),
-
+                                            ...formData.scope.split('\n').map(line => new Paragraph({ text: line, font: "Aptos" })),
                                             new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true, font: "Aptos" })] }),
                                             ...formData.deliverables.split('\n').map(line => new Paragraph({ text: line, font: "Aptos" })),
                                             new Paragraph({ children: [new TextRun({ text: "Resources", bold: true, font: "Aptos" })] }),
@@ -821,14 +762,6 @@ new Paragraph({
 
                     new Paragraph({ text: "" }),
                     new Paragraph({ text: "Yours sincerely,", font: "Aptos" }),
-                    // --- Footer ---
-new Paragraph({
-    text: `Revision: ${formData.revision} | Generated on ${formData.date}`,
-    alignment: AlignmentType.CENTER,
-    spacing: { before: 400 },
-    children: [new TextRun({ italics: true, size: 20 })],
-}),
-
                     new Paragraph({ text: "", font: "Aptos" }),
                     new Paragraph({ text: formData.name, font: "Aptos" }),
                     new Paragraph({ text: formData.department, font: "Aptos" }),
