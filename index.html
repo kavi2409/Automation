@@ -607,50 +607,78 @@
                         },
 children: [
     // --- Logo at top-right ---
-    new Paragraph({
-    children: [
-        new docx.ImageRun({
-            data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-            transformation: { width: 80, height: 80 }, // Adjust size as needed
-        }),
-    ],
-    alignment: AlignmentType.RIGHT,
-}),
-
-    new Paragraph({ text: "" }), // spacing
-
-    // --- Header Table ---
-    new Table({
+    // --- Combined Header Row: Metadata Table + Logo ---
+new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     borders: {
-        top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-        bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-        left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-        right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-        insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-        insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        top: { style: BorderStyle.NONE },
+        bottom: { style: BorderStyle.NONE },
+        left: { style: BorderStyle.NONE },
+        right: { style: BorderStyle.NONE },
+        insideHorizontal: { style: BorderStyle.NONE },
+        insideVertical: { style: BorderStyle.NONE },
     },
     rows: [
         new TableRow({
             children: [
-                new TableCell({ children: [new Paragraph({ text: "Document I.D. No" })] }),
-                new TableCell({ children: [new Paragraph({ text: formData.docRef })] }),
-            ],
-        }),
-        new TableRow({
-            children: [
-                new TableCell({ children: [new Paragraph({ text: "Revision" })] }),
-                new TableCell({ children: [new Paragraph({ text: formData.revision })] }),
-            ],
-        }),
-        new TableRow({
-            children: [
-                new TableCell({ children: [new Paragraph({ text: "Date" })] }),
-                new TableCell({ children: [new Paragraph({ text: formData.metaDate })] }),
+                // Left Cell: Metadata Table
+                new TableCell({
+                    width: { size: 60, type: WidthType.PERCENTAGE },
+                    children: [
+                        new Table({
+                            width: { size: 100, type: WidthType.PERCENTAGE },
+                            borders: {
+                                top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                            },
+                            rows: [
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ children: [new Paragraph({ text: "Document I.D. No", bold: true })] }),
+                                        new TableCell({ children: [new Paragraph({ text: formData.docRef })] }),
+                                    ],
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ children: [new Paragraph({ text: "Revision", bold: true })] }),
+                                        new TableCell({ children: [new Paragraph({ text: formData.revision })] }),
+                                    ],
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ children: [new Paragraph({ text: "Date", bold: true })] }),
+                                        new TableCell({ children: [new Paragraph({ text: formData.metaDate })] }),
+                                    ],
+                                }),
+                            ],
+                        }),
+                    ],
+                }),
+
+                // Right Cell: Logo
+                new TableCell({
+                    width: { size: 40, type: WidthType.PERCENTAGE },
+                    children: [
+                        new Paragraph({
+                            children: [
+                                new docx.ImageRun({
+                                    data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+                                    transformation: { width: 80, height: 80 },
+                                }),
+                            ],
+                            alignment: AlignmentType.RIGHT,
+                        }),
+                    ],
+                }),
             ],
         }),
     ],
 }),
+
 
 
     new Paragraph({ text: "" }), // spacing
