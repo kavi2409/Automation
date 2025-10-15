@@ -611,7 +611,7 @@ children: [
     children: [
         new docx.ImageRun({
             data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-            transformation: { width: 140, height: 80 }, // Adjust size as needed
+            transformation: { width: 80, height: 80 }, // Adjust size as needed
         }),
     ],
     alignment: AlignmentType.RIGHT,
@@ -621,42 +621,37 @@ children: [
 
     // --- Header Table ---
     new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        borders: {
-            top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-            bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-            left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-            right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-            insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-            insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-        },
-        rows: [
-            new TableRow({
-                children: [
-                    new TableCell({
-                        width: { size: 30, type: WidthType.PERCENTAGE },
-                        children: [new Paragraph({ text: "Document Ref. No." })],
-                    }),
-                    new TableCell({
-                        width: { size: 70, type: WidthType.PERCENTAGE },
-                        children: [new Paragraph({ text: "" })],
-                    }),
-                ],
-            }),
-            new TableRow({
-                children: [
-                    new TableCell({ children: [new Paragraph({ text: "Revision" })] }),
-                    new TableCell({ children: [new Paragraph({ text: "" })] }),
-                ],
-            }),
-            new TableRow({
-                children: [
-                    new TableCell({ children: [new Paragraph({ text: "Date" })] }),
-                    new TableCell({ children: [new Paragraph({ text: "" })] }),
-                ],
-            }),
-        ],
-    }),
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: {
+        top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+        insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+    },
+    rows: [
+        new TableRow({
+            children: [
+                new TableCell({ children: [new Paragraph({ text: "Document I.D. No" })] }),
+                new TableCell({ children: [new Paragraph({ text: formData.docRef })] }),
+            ],
+        }),
+        new TableRow({
+            children: [
+                new TableCell({ children: [new Paragraph({ text: "Revision" })] }),
+                new TableCell({ children: [new Paragraph({ text: formData.revision })] }),
+            ],
+        }),
+        new TableRow({
+            children: [
+                new TableCell({ children: [new Paragraph({ text: "Date" })] }),
+                new TableCell({ children: [new Paragraph({ text: formData.metaDate })] }),
+            ],
+        }),
+    ],
+}),
+
 
     new Paragraph({ text: "" }), // spacing
 
