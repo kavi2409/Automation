@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EFA Proposal Generator</title>
     
-    <!-- Load docx library from CDN -->
     <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
@@ -32,25 +31,21 @@
             padding: 50px;
         }
         
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 3px solid #1e3c72;
-        }
-        
-        .logo {
-            width: 100px;
-            height: 100px;
-            background: #1e3c72;
-            border-radius: 50%;
-            margin: 0 auto 20px;
+        .efa-header {
+            width: 100%;
             display: flex;
+            justify-content: flex-end;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 36px;
-            font-weight: bold;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            margin-bottom: 30px;
+        }
+
+        .efa-logo {
+            width: 140px;
+            height: auto;
+            border-radius: 8px;
+            object-fit: contain;
         }
         
         h1 {
@@ -273,8 +268,11 @@
 </head>
 <body>
     <div class="container">
+        <div class="efa-header">
+            <img src="./efa_logo.png" alt="EFA Engineering Logo" class="efa-logo">
+        </div>
+        
         <div class="header">
-            <div class="logo">EFA</div>
             <h1>EFA Proposal Generator</h1>
             <p class="subtitle">Professional Proposal Document System</p>
         </div>
@@ -287,7 +285,6 @@
         </div>
         
         <form id="proposalForm">
-            <!-- BASIC INFORMATION -->
             <div class="section-title">📋 Basic Information</div>
             
             <div class="row">
@@ -324,7 +321,6 @@
                 <textarea id="generalInfo" placeholder="Provide an overview of the proposal and project context..." required></textarea>
             </div>
             
-            <!-- PRICING INFORMATION -->
             <div class="section-title">💷 Pricing Information</div>
             
             <div class="form-group">
@@ -341,7 +337,6 @@
                 <input type="number" id="finalPrice" step="0.01" min="0" placeholder="e.g., 50000.00" required>
             </div>
             
-            <!-- DELIVERABLES SECTION -->
             <div id="deliverablesSection" class="hidden">
                 <div class="row">
                     <div class="form-group">
@@ -364,13 +359,11 @@
                 </div>
             </div>
             
-            <!-- TIMESHEETS SECTION -->
             <div id="timesheetsSection" class="hidden">
                 <div id="consultantsContainer"></div>
                 <button type="button" class="btn-add" onclick="addConsultant()">➕ Add Consultant</button>
             </div>
             
-            <!-- DETAILED INFORMATION -->
             <div class="section-title">📝 Detailed Information</div>
             
             <div class="form-group">
@@ -393,7 +386,6 @@
                 <textarea id="resources" placeholder="Describe the resources required..." required></textarea>
             </div>
             
-            <!-- DURATION -->
             <div class="section-title">📅 Duration</div>
             
             <div class="form-group">
@@ -413,7 +405,6 @@
                 </div>
             </div>
             
-            <!-- COMMERCIAL TERMS -->
             <div class="section-title">📄 Commercial Terms</div>
             
             <div class="form-group">
@@ -437,14 +428,11 @@
     </div>
 
     <script>
-        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle, HeadingLevel } = docx;
         
         let consultantCount = 0;
         
-        // Set today's date as default
         document.getElementById('date').valueAsDate = new Date();
         
-        // Handle proposal type change
         document.getElementById('proposalType').addEventListener('change', function() {
             const deliverablesSection = document.getElementById('deliverablesSection');
             const timesheetsSection = document.getElementById('timesheetsSection');
@@ -462,7 +450,6 @@
             }
         });
         
-        // Auto-calculate rate per period
         document.getElementById('finalPrice').addEventListener('input', calculateRate);
         document.getElementById('timePeriodNumber').addEventListener('input', calculateRate);
         
@@ -575,9 +562,54 @@
             return contracts[contractType] || '';
         }
         
+        async function getBase64Image(url) {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+        
+        function textToParagraphs(text) {
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+            return lines.map(line => new Paragraph({
+                text: line.trim(),
+                style: 'Normal'
+            }));
+        }
+
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
             try {
+                const logoBase64 = await getBase64Image("./efa_logo.png");
+
                 const doc = new Document({
+                    styles: {
+                        default: {
+                            document: {
+                                run: {
+                                    font: "Aptos"
+                                }
+                            }
+                        },
+                        paragraphStyles: [{
+                            id: "Normal",
+                            name: "Normal",
+                            run: {
+                                font: "Aptos",
+                                size: 22
+                            },
+                            paragraph: {
+                                spacing: {
+                                    line: 276,
+                                    before: 0,
+                                    after: 120
+                                }
+                            }
+                        }]
+                    },
                     sections: [{
                         properties: {
                             page: {
@@ -589,8 +621,69 @@
                                 },
                             },
                         },
+                        footers: {
+                            default: new Footer({
+                                children: [
+                                    new Paragraph({
+                                        children: [
+                                            new TextRun({
+                                                text: "EFA Engineering Limited",
+                                                font: "Aptos",
+                                                size: 18
+                                            })
+                                        ],
+                                        alignment: AlignmentType.CENTER
+                                    }),
+                                    new Paragraph({
+                                        children: [
+                                            new TextRun({
+                                                text: "Registered Office: 128 City Road, London, United Kingdom, EC1V 2NX",
+                                                font: "Aptos",
+                                                size: 18
+                                            })
+                                        ],
+                                        alignment: AlignmentType.CENTER
+                                    }),
+                                    new Paragraph({
+                                        children: [
+                                            new TextRun({
+                                                text: "T: +44 (0)7734 146510",
+                                                font: "Aptos",
+                                                size: 18
+                                            })
+                                        ],
+                                        alignment: AlignmentType.CENTER
+                                    }),
+                                    new Paragraph({
+                                        children: [
+                                            new TextRun({
+                                                text: "Registered in England no. 08608392",
+                                                font: "Aptos",
+                                                size: 18
+                                            })
+                                        ],
+                                        alignment: AlignmentType.CENTER
+                                    })
+                                ]
+                            })
+                        },
                         children: [
-                            // Header Table
+                            new Paragraph({
+                                children: [
+                                    new ImageRun({
+                                        data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+                                        transformation: { width: 120, height: 120 },
+                                        floating: {
+                                            horizontalPosition: { align: "right" },
+                                            verticalPosition: { offset: 0 }
+                                        }
+                                    }),
+                                ],
+                                alignment: AlignmentType.RIGHT,
+                            }),
+
+                            new Paragraph({ text: "" }),
+
                             new Table({
                                 width: { size: 100, type: WidthType.PERCENTAGE },
                                 borders: {
@@ -605,164 +698,20 @@
                                     new TableRow({
                                         children: [
                                             new TableCell({
-                                                width: { size: 30, type: WidthType.PERCENTAGE },
-                                                children: [new Paragraph({ text: "Document Ref. No." })],
-                                            }),
-                                            new TableCell({
-                                                width: { size: 70, type: WidthType.PERCENTAGE },
-                                                children: [new Paragraph({ text: "" })],
-                                            }),
-                                        ],
-                                    }),
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({ children: [new Paragraph({ text: "Revision" })] }),
-                                            new TableCell({ children: [new Paragraph({ text: "" })] }),
-                                        ],
-                                    }),
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({ children: [new Paragraph({ text: "Date" })] }),
-                                            new TableCell({ children: [new Paragraph({ text: "" })] }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            
-                            new Paragraph({ text: "" }),
-                            
-                            new Paragraph({
-                                text: "Private and Confidential",
-                                alignment: AlignmentType.RIGHT,
-                            }),
-                            
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: `FAO: ${formData.name}` }),
-                            new Paragraph({ text: formData.department }),
-                            new Paragraph({ text: formData.company }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: formData.date }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: "Private and Confidential" }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: `Dear ${formData.name},` }),
-                            new Paragraph({ text: "" }),
-                            
-                            new Paragraph({
-                                children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true })],
-                            }),
-                            
-                            new Paragraph({ text: "" }),
-                            
-                            // Content Box 1 with border
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
                                                 children: [
-                                                    new Paragraph({ text: formData.generalInfo }),
+                                                    ...textToParagraphs(formData.detailedInfo),
                                                     new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: `Our price for the work is £${formData.finalPrice.toFixed(2)} (${priceInWords}). Excluding VAT.` }),
+                                                    new Paragraph({ children: [new TextRun({ text: "Scope", bold: true, font: "Aptos" })], style: "Normal" }),
                                                     new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: pricingText }),
+                                                    ...textToParagraphs(formData.scope),
                                                     new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: "Please see full details of scope and deliverables on the following pages:" }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            
-                            new Paragraph({ text: "" }),
-                            
-                            // Content Box 2 with border
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                    new Paragraph({ text: formData.detailedInfo }),
+                                                    new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true, font: "Aptos" })], style: "Normal" }),
                                                     new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Scope", bold: true })] }),
+                                                    ...textToParagraphs(formData.deliverables),
                                                     new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: formData.scope }),
+                                                    new Paragraph({ children: [new TextRun({ text: "Resources", bold: true, font: "Aptos" })], style: "Normal" }),
                                                     new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true })] }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: formData.deliverables }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Resources", bold: true })] }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: formData.resources }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            
-                            new Paragraph({ text: "" }),
-                            
-                            // Duration Box
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                    new Paragraph({ children: [new TextRun({ text: "DURATION", bold: true })] }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: `The duration of the work is ${formData.duration}, commencing on ${formData.startDate} and concluding on ${formData.endDate}. The project will be billed periodically with the payment application being supported by an up-to-date delivery programme.` }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            
-                            new Paragraph({ text: "" }),
-                            
-                            // Commercial Box
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                                                                        new Paragraph({ text: formData.contractType }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: contractText }),
+                                                    ...textToParagraphs(formData.resources),
                                                 ],
                                             }),
                                         ],
@@ -771,12 +720,65 @@
                             }),
 
                             new Paragraph({ text: "" }),
-                            new Paragraph({ text: "Yours sincerely," }),
+
+                            new Table({
+                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                borders: {
+                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                },
+                                rows: [
+                                    new TableRow({
+                                        children: [
+                                            new TableCell({
+                                                children: [
+                                                    new Paragraph({ children: [new TextRun({ text: "DURATION", bold: true, font: "Aptos" })], style: "Normal" }),
+                                                    new Paragraph({ text: "" }),
+                                                    new Paragraph({ text: `The duration of the work is ${formData.duration}, commencing on ${formData.startDate} and concluding on ${formData.endDate}. The project will be billed periodically with the payment application being supported by an up-to-date delivery programme.`, style: "Normal" }),
+                                                ],
+                                            }),
+                                        ],
+                                    }),
+                                ],
+                            }),
+
                             new Paragraph({ text: "" }),
-                            new Paragraph({ text: formData.name }),
-                            new Paragraph({ text: formData.department }),
-                            new Paragraph({ text: formData.company }),
-                        ],
+
+                            new Table({
+                                width: { size: 100, type: WidthType.PERCENTAGE },
+                                borders: {
+                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                },
+                                rows: [
+                                    new TableRow({
+                                        children: [
+                                            new TableCell({
+                                                children: [
+                                                    new Paragraph({ text: formData.contractType, style: "Normal" }),
+                                                    new Paragraph({ text: "" }),
+                                                    new Paragraph({ text: contractText, style: "Normal" }),
+                                                    new Paragraph({ text: "" }),
+                                                    new Paragraph({ text: "The law of the contract is the Law of England and Wales.", style: "Normal" }),
+                                                    new Paragraph({ children: [new TextRun({ text: "The assessment day", italics: true, font: "Aptos" }), new TextRun({ text: " is within 28 days from the ", font: "Aptos" }), new TextRun({ text: "starting date", italics: true, font: "Aptos" }), new TextRun({ text: ".", font: "Aptos" })], style: "Normal" }),
+                                                ],
+                                            }),
+                                        ],
+                                    }),
+                                ],
+                            }),
+
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: "Yours sincerely,", style: "Normal" }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: formData.name, style: "Normal" }),
+                            new Paragraph({ text: formData.department, style: "Normal" }),
+                            new Paragraph({ text: formData.company, style: "Normal" }),
+                        ]
                     }],
                 });
 
@@ -790,7 +792,6 @@
             }
         }
 
-        // Handle form submission
         document.getElementById('proposalForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -812,7 +813,8 @@
                 duration: document.getElementById('duration').value.trim(),
                 startDate: document.getElementById('startDate').value,
                 endDate: document.getElementById('endDate').value,
-                contractType: document.getElementById('contractType').value
+                contractType: document.getElementById('contractType').value,
+                timePeriodNumber: document.getElementById('timePeriodNumber').value
             };
 
             let pricingText = '';
@@ -838,4 +840,5 @@
         });
     </script>
 </body>
-</html>
+</html>    
+                                
