@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EFA Proposal Generator</title>
     
-    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <style>
@@ -585,29 +585,17 @@
     }
 }
         
-        function textToParagraphs(text) {
-            const lines = text.split('\n').filter(line => line.trim() !== '');
-            return lines.map(line => new Paragraph({
-                text: line.trim(),
-                style: 'Normal'
-            }));
-        }
+        function textToParagraphs(text, Paragraph) {
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    return lines.map(line => new Paragraph({
+        text: line.trim(),
+        spacing: { after: 200 }
+    }));
+}
 
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
     try {
-        const {
-    Document,
-    Packer,
-    Paragraph,
-    TextRun,
-    Table,
-    TableRow,
-    TableCell,
-    BorderStyle,
-    WidthType,
-    AlignmentType,
-    ImageRun 
-} = window.docx;
+        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, BorderStyle, WidthType, AlignmentType } = docx;
         const logoBase64 = await getBase64Image("efa_logo.png"); // may be null
 
         const doc = new Document({
@@ -710,7 +698,7 @@
                     new Paragraph({ text: "" }),
 
                     // Main content (no heavy boxed borders)
-                    ...textToParagraphs(formData.generalInfo),
+                    ...textToParagraphs(formData.generalInfo, Paragraph),
                     new Paragraph({ text: "" }),
                     new Paragraph({ text: `Our price for the work is £${(formData.finalPrice || 0).toFixed(2)} (${priceInWords}). Excluding VAT.`, style: "Normal" }),
                     new Paragraph({ text: "" }),
@@ -721,13 +709,13 @@
 
                     // Detailed sections
                     new Paragraph({ children: [new TextRun({ text: "Scope", bold: true, font: "Aptos" })] }),
-                    ...textToParagraphs(formData.scope),
+                    ...textToParagraphs(formData.scope,Paragraph),
                     new Paragraph({ text: "" }),
                     new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true, font: "Aptos" })] }),
-                    ...textToParagraphs(formData.deliverables),
+                    ...textToParagraphs(formData.deliverables,Paragraph),
                     new Paragraph({ text: "" }),
                     new Paragraph({ children: [new TextRun({ text: "Resources", bold: true, font: "Aptos" })] }),
-                    ...textToParagraphs(formData.resources),
+                    ...textToParagraphs(formData.resources,paragraph),
                     new Paragraph({ text: "" }),
 
                     new Paragraph({ children: [new TextRun({ text: "Duration", bold: true, font: "Aptos" })] }),
