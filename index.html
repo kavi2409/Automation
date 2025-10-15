@@ -46,11 +46,13 @@
     }
 
     .efa-logo {
-        width: 140px;    /* Adjust size to fit nicely */
-        height: auto;
-        border-radius: 8px;
-        object-fit: contain;
-    }
+    width: 100px;              /* Set equal width & height for perfect circle */
+    height: 100px;
+    border-radius: 50%;        /* Makes it circular */
+    object-fit: cover;         /* Ensures it fills the circle without stretching */
+    border: 2px solid #1e3c72; /* Optional: neat border around it */
+}
+
         
         h1 {
             color: #1e3c72;
