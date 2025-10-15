@@ -563,15 +563,27 @@
         }
         
         async function getBase64Image(url) {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        }
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        return await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // Return base64 without the data:... prefix
+                const dataUrl = reader.result;
+                const base64 = dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
+                resolve(base64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    } catch (err) {
+        console.warn("getBase64Image failed for", url, err);
+        // Return null so caller knows image wasn't loaded (no throw)
+        return null;
+    }
+}
         
         function textToParagraphs(text) {
             const lines = text.split('\n').filter(line => line.trim() !== '');
@@ -582,215 +594,155 @@
         }
 
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
-            try {
-                const logoBase64 = await getBase64Image("efa_logo.png");
+    try {
+        const logoBase64 = await getBase64Image("./efa_logo.png"); // may be null
 
-                const doc = new Document({
-                    styles: {
-                        default: {
-                            document: {
-                                run: {
-                                    font: "Aptos"
-                                }
-                            }
-                        },
-                        paragraphStyles: [{
-                            id: "Normal",
-                            name: "Normal",
-                            run: {
-                                font: "Aptos",
-                                size: 22
-                            },
-                            paragraph: {
-                                spacing: {
-                                    line: 276,
-                                    before: 0,
-                                    after: 120
-                                }
-                            }
-                        }]
+        const doc = new Document({
+            styles: {
+                default: {
+                    document: {
+                        run: {
+                            font: "Aptos"
+                        }
+                    }
+                },
+                paragraphStyles: [{
+                    id: "Normal",
+                    name: "Normal",
+                    run: {
+                        font: "Aptos",
+                        size: 22
                     },
-                    sections: [{
-                        properties: {
-                            page: {
-                                margin: {
-                                    top: 720,
-                                    right: 1080,
-                                    bottom: 720,
-                                    left: 1080,
-                                },
-                            },
+                    paragraph: {
+                        spacing: {
+                            line: 276,
+                            before: 0,
+                            after: 120
+                        }
+                    }
+                }]
+            },
+            sections: [{
+                properties: {
+                    page: {
+                        margin: {
+                            top: 720,
+                            right: 1080,
+                            bottom: 720,
+                            left: 1080,
                         },
-                        footers: {
-                            default: new Footer({
-                                children: [
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "EFA Engineering Limited",
-                                                font: "Aptos",
-                                                size: 18
-                                            })
-                                        ],
-                                        alignment: AlignmentType.CENTER
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Registered Office: 128 City Road, London, United Kingdom, EC1V 2NX",
-                                                font: "Aptos",
-                                                size: 18
-                                            })
-                                        ],
-                                        alignment: AlignmentType.CENTER
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "T: +44 (0)7734 146510",
-                                                font: "Aptos",
-                                                size: 18
-                                            })
-                                        ],
-                                        alignment: AlignmentType.CENTER
-                                    }),
-                                    new Paragraph({
-                                        children: [
-                                            new TextRun({
-                                                text: "Registered in England no. 08608392",
-                                                font: "Aptos",
-                                                size: 18
-                                            })
-                                        ],
-                                        alignment: AlignmentType.CENTER
-                                    })
-                                ]
-                            })
-                        },
+                    },
+                },
+                // NOTE: I removed the footer/boxed separators per your request? 
+                // If you still want a footer or boxes, re-add those blocks here.
+                children: [
+                    // only add ImageRun if logoBase64 loaded
+                    ...(logoBase64 ? [ new Paragraph({
                         children: [
-                            new Paragraph({
+                            new ImageRun({
+                                data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+                                // use square dimensions; if your PNG is circular with transparent background it will appear circular
+                                transformation: { width: 90, height: 90 },
+                                floating: {
+                                    horizontalPosition: { align: "right" },
+                                    verticalPosition: { offset: 0 }
+                                }
+                            })
+                        ],
+                        alignment: AlignmentType.RIGHT,
+                    })] : []),
+
+                    new Paragraph({ text: "" }),
+
+                    // Intro table (kept simple)
+                    new Table({
+                        width: { size: 100, type: WidthType.PERCENTAGE },
+                        borders: {
+                            top: { style: BorderStyle.NONE, size: 0, color: "000000" },
+                            bottom: { style: BorderStyle.NONE, size: 0, color: "000000" },
+                            left: { style: BorderStyle.NONE, size: 0, color: "000000" },
+                            right: { style: BorderStyle.NONE, size: 0, color: "000000" },
+                        },
+                        rows: [
+                            new TableRow({
                                 children: [
-                                    new ImageRun({
-                                        data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-                                        transformation: { width: 120, height: 120 },
-                                        floating: {
-                                            horizontalPosition: { align: "right" },
-                                            verticalPosition: { offset: 0 }
-                                        }
+                                    new TableCell({
+                                        width: { size: 30, type: WidthType.PERCENTAGE },
+                                        children: [new Paragraph({ text: "Document Ref. No.", style: "Normal" })],
                                     }),
-                                ],
-                                alignment: AlignmentType.RIGHT,
-                            }),
-
-                            new Paragraph({ text: "" }),
-
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                    ...textToParagraphs(formData.detailedInfo),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Scope", bold: true, font: "Aptos" })], style: "Normal" }),
-                                                    new Paragraph({ text: "" }),
-                                                    ...textToParagraphs(formData.scope),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true, font: "Aptos" })], style: "Normal" }),
-                                                    new Paragraph({ text: "" }),
-                                                    ...textToParagraphs(formData.deliverables),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Resources", bold: true, font: "Aptos" })], style: "Normal" }),
-                                                    new Paragraph({ text: "" }),
-                                                    ...textToParagraphs(formData.resources),
-                                                ],
-                                            }),
-                                        ],
+                                    new TableCell({
+                                        width: { size: 70, type: WidthType.PERCENTAGE },
+                                        children: [new Paragraph({ text: "", style: "Normal" })],
                                     }),
                                 ],
                             }),
+                        ],
+                    }),
 
-                            new Paragraph({ text: "" }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ text: "Private and Confidential", alignment: AlignmentType.RIGHT, style: "Normal" }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ text: `FAO: ${formData.name}`, style: "Normal" }),
+                    new Paragraph({ text: formData.department, style: "Normal" }),
+                    new Paragraph({ text: formData.company, style: "Normal" }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ text: formData.date, style: "Normal" }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ text: `Dear ${formData.name},`, style: "Normal" }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true, font: "Aptos" })],
+                        style: "Normal"
+                    }),
+                    new Paragraph({ text: "" }),
 
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                    new Paragraph({ children: [new TextRun({ text: "DURATION", bold: true, font: "Aptos" })], style: "Normal" }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: `The duration of the work is ${formData.duration}, commencing on ${formData.startDate} and concluding on ${formData.endDate}. The project will be billed periodically with the payment application being supported by an up-to-date delivery programme.`, style: "Normal" }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
+                    // Main content (no heavy boxed borders)
+                    ...textToParagraphs(formData.generalInfo),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ text: `Our price for the work is £${(formData.finalPrice || 0).toFixed(2)} (${priceInWords}). Excluding VAT.`, style: "Normal" }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ text: pricingText || "", style: "Normal" }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ text: "Please see full details of scope and deliverables below:", style: "Normal" }),
+                    new Paragraph({ text: "" }),
 
-                            new Paragraph({ text: "" }),
+                    // Detailed sections
+                    new Paragraph({ children: [new TextRun({ text: "Scope", bold: true, font: "Aptos" })] }),
+                    ...textToParagraphs(formData.scope),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true, font: "Aptos" })] }),
+                    ...textToParagraphs(formData.deliverables),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ children: [new TextRun({ text: "Resources", bold: true, font: "Aptos" })] }),
+                    ...textToParagraphs(formData.resources),
+                    new Paragraph({ text: "" }),
 
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                    new Paragraph({ text: formData.contractType, style: "Normal" }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: contractText, style: "Normal" }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: "The law of the contract is the Law of England and Wales.", style: "Normal" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "The assessment day", italics: true, font: "Aptos" }), new TextRun({ text: " is within 28 days from the ", font: "Aptos" }), new TextRun({ text: "starting date", italics: true, font: "Aptos" }), new TextRun({ text: ".", font: "Aptos" })], style: "Normal" }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
+                    new Paragraph({ children: [new TextRun({ text: "Duration", bold: true, font: "Aptos" })] }),
+                    new Paragraph({ text: `The duration of the work is ${formData.duration}, commencing on ${formData.startDate} and concluding on ${formData.endDate}.`, style: "Normal" }),
+                    new Paragraph({ text: "" }),
 
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: "Yours sincerely,", style: "Normal" }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: formData.name, style: "Normal" }),
-                            new Paragraph({ text: formData.department, style: "Normal" }),
-                            new Paragraph({ text: formData.company, style: "Normal" }),
-                        ]
-                    }],
-                });
+                    new Paragraph({ children: [new TextRun({ text: "Commercial Terms", bold: true, font: "Aptos" })] }),
+                    new Paragraph({ text: contractText || "", style: "Normal" }),
+                    new Paragraph({ text: "" }),
 
-                const blob = await Packer.toBlob(doc);
-                saveAs(blob, `${formData.proposalTitle.replace(/\s+/g, '_')}_Proposal.docx`);
-            } catch (error) {
-                console.error("Error generating Word document:", error);
-                alert("❌ Something went wrong while generating the Word document. Please try again.");
-            } finally {
-                document.getElementById('loadingIndicator').classList.remove('active');
-            }
-        }
+                    new Paragraph({ text: "Yours sincerely,", style: "Normal" }),
+                    new Paragraph({ text: "" }),
+                    new Paragraph({ text: formData.name, style: "Normal" }),
+                    new Paragraph({ text: formData.department, style: "Normal" }),
+                    new Paragraph({ text: formData.company, style: "Normal" }),
+                ],
+            }],
+        });
+
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${(formData.proposalTitle || 'proposal').replace(/\s+/g, '_')}_Proposal.docx`);
+    } catch (error) {
+        console.error("Error generating Word document:", error);
+        alert("❌ Something went wrong while generating the Word document. Please try again.");
+    } finally {
+        document.getElementById('loadingIndicator').classList.remove('active');
+    }
+}
 
         document.getElementById('proposalForm').addEventListener('submit', async function (e) {
             e.preventDefault();
