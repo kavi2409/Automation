@@ -594,18 +594,29 @@
         const logoBase64 = await getBase64Image("./efa_logo.png");
 
         const doc = new Document({
-            sections: [{
-                        properties: {
-                            page: {
-                                margin: {
-                                    top: 720,
-                                    right: 1080,
-                                    bottom: 720,
-                                    left: 1080,
-                                    font: "Aptos",
-                                },
-                            },
-                        },
+    styles: {
+        default: {
+            document: {
+                run: {
+                    font: "Aptos",
+                },
+                paragraph: {
+                    spacing: { after: 120 },
+                },
+            },
+        },
+    },
+    sections: [{
+        properties: {
+            page: {
+                margin: {
+                    top: 720,
+                    right: 1080,
+                    bottom: 720,
+                    left: 1080,
+                },
+            },
+        },
 children: [
     // --- Logo at top-right ---
     
