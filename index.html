@@ -52,6 +52,13 @@
             font-size: 36px;
             font-weight: bold;
         }
+        .logo img.efa-logo {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
         
         h1 {
             color: #1e3c72;
@@ -274,7 +281,10 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">EFA</div>
+            <div class="logo">
+    <img src="efa_logo.png" alt="EFA Logo" class="efa-logo">
+</div>
+
             <h1>EFA Proposal Generator</h1>
             <p class="subtitle">Professional Proposal Document System</p>
         </div>
@@ -592,16 +602,7 @@
                         },
                         
                         children: [
-                            // --- Logo ---
-            new Paragraph({
-                children: [
-                    new ImageRun({
-                    data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-                    transformation: { width: 120, height: 120 },
-                }),
-            ],
-            alignment: AlignmentType.RIGHT,
-          }),// Header Table
+                            // Header Table
                             new Table({
                                 width: { size: 100, type: WidthType.PERCENTAGE },
                                 borders: {
