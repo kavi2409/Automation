@@ -577,6 +577,7 @@
         
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
             try {
+                const logoBase64 = await getBase64Image("./efa_logo.png");
                 const doc = new Document({
                     sections: [{
                         properties: {
@@ -589,8 +590,18 @@
                                 },
                             },
                         },
+                        
                         children: [
-                            // Header Table
+                            // --- Logo ---
+            new Paragraph({
+                children: [
+                    new ImageRun({
+                    data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+                    transformation: { width: 120, height: 120 },
+                }),
+            ],
+            alignment: AlignmentType.RIGHT,
+          }),// Header Table
                             new Table({
                                 width: { size: 100, type: WidthType.PERCENTAGE },
                                 borders: {
