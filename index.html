@@ -52,12 +52,7 @@
             font-size: 36px;
             font-weight: bold;
         }
-        .logo img.efa-logo {
-    width: 120px;
-    height: auto;
-    object-fit: contain;
-    display: block;
-}
+      
 
         
         h1 {
@@ -587,7 +582,7 @@
         
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
             try {
-                const logoBase64 = await getBase64Image("./efa_logo.png");
+                const logoBase64 = await getBase64Image("efa_logo.png");
                 const doc = new Document({
                     sections: [{
                         properties: {
@@ -661,7 +656,7 @@
                             new Paragraph({ text: "" }),
                             
                             new Paragraph({
-                                children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true })],
+                                children: [new TextRun({ text: font`Re: ${formData.proposalTitle}`, bold: true })],
                             }),
                             
                             new Paragraph({ text: "" }),
