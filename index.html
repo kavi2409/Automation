@@ -206,7 +206,17 @@
                             })
                         },
                         children: [
-                            new Paragraph({ children: [new ImageRun({ data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)), transformation: { width: 120, height: 120 }, floating: { horizontalPosition: { align: "right" }, verticalPosition: { offset: 0 } } })], alignment: AlignmentType.RIGHT }),
+                           new Paragraph({
+  alignment: AlignmentType.RIGHT,
+  children: [
+    new ImageRun({
+      data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+      transformation: { width: 120, height: 120 },
+    }),
+  ],
+}),
+new Paragraph({ text: "" }), // extra spacing below image
+
                             new Paragraph({ text: "" }),
                             new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ width: { size: 30, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "Document Ref. No.", style: "Normal" })] }), new TableCell({ width: { size: 70, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "", style: "Normal" })] })] }), new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: "Revision", style: "Normal" })] }), new TableCell({ children: [new Paragraph({ text: "", style: "Normal" })] })] }), new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: "Date", style: "Normal" })] }), new TableCell({ children: [new Paragraph({ text: "", style: "Normal" })] })] })] }),
                             new Paragraph({ text: "" }),
