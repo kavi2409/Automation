@@ -272,12 +272,14 @@
 </head>
 <body>
     <header class="efa-header">
-        <img src="efa_logo.png" alt="EFA Logo" class="efa-logo">
+        <img src="./efa_logo.png" <img src="efa_logo.png" alt="EFA Logo" class="efa-logo">
 
+             alt="EFA Engineering Logo" 
+             class="efa-logo">
     </header>
     <div class="container">
         <div class="header">
-            <img src="efa_logo.png" alt="EFA Logo" class="efa-logo" style="width:120px; height:auto;">
+            <img src="efa_logo.png" alt="EFA Logo" style="width:120px; height:auto;">
             <h1>EFA Proposal Generator</h1>
             <p class="subtitle">Professional Proposal Document System</p>
         </div>
@@ -611,7 +613,7 @@ children: [
     children: [
         new docx.ImageRun({
             data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-            transformation: { width: 80, height: 80 }, // Adjust size as needed
+            transformation: { width: 140, height: 80 }, // Adjust size as needed
         }),
     ],
     alignment: AlignmentType.RIGHT,
