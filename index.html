@@ -214,12 +214,10 @@
             },
             sections: [{
                 properties: {
-                    page: { margin: { top: 720, right: 1080, bottom: 720, left: 1080 } },
-                    differentFirst: true // enables different first page header
+                    page: { margin: { top: 720, right: 1080, bottom: 720, left: 1080 } }
                 },
                 headers: {
-                    first: header,       // header only on first page
-                    default: undefined   // no header on subsequent pages
+                    default: header // assign the logo header here
                 },
                 footers: {
                     default: new docx.Footer({
@@ -232,10 +230,7 @@
                     })
                 },
                 children: [
-                    // Add spacing before main content
-                    new docx.Paragraph({ text: "" }),
-
-                    // Main info table
+                    new docx.Paragraph({ text: "" }), // optional spacing
                     new docx.Table({
                         width: { size: 100, type: docx.WidthType.PERCENTAGE },
                         borders: {
@@ -267,7 +262,6 @@
                             })
                         ]
                     }),
-
                     new docx.Paragraph({ text: "" }),
                     new docx.Paragraph({ text: "Private and Confidential", alignment: docx.AlignmentType.RIGHT, style: "Normal" }),
                     new docx.Paragraph({ text: "" }),
@@ -280,6 +274,8 @@
                     new docx.Paragraph({ text: "Private and Confidential", style: "Normal" }),
                     new docx.Paragraph({ text: "" }),
                     new docx.Paragraph({ text: `Dear ${formData.name},`, style: "Normal" }),
+                    new docx.Paragraph({ text: "" }),
+                    new docx.Paragraph({ children: [new docx.TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true, font: "Aptos" })], style: "Normal" }),
                     new docx.Paragraph({ text: "" }),
                     new Paragraph({ text: "" }),
                             new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ children: [...textToParagraphs(formData.generalInfo), new Paragraph({ text: "" }), new Paragraph({ text: `Our price for the work is £${formData.finalPrice.toFixed(2)} (${priceInWords}). Excluding VAT.`, style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: pricingText, style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: "Please see full details of scope and deliverables on the following pages:", style: "Normal" })] })] })] }),
