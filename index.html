@@ -590,6 +590,19 @@
                             },
                         },
                         children: [
+                            new Paragraph({
+    children: [
+        new ImageRun({
+            data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+            transformation: {
+                width: 120, // ✅ only width (no height → keeps proportions)
+            },
+        }),
+    ],
+    alignment: AlignmentType.RIGHT,
+}),
+
+new Paragraph({ text: "" })
                             // Header Table
                             new Table({
                                 width: { size: 100, type: WidthType.PERCENTAGE },
