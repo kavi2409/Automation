@@ -188,6 +188,20 @@
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
             try {
                 const logoBase64 = await getBase64Image("./efa_logo.png");
+                const header = new docx.Header({
+  children: [
+    new Paragraph({
+      alignment: AlignmentType.RIGHT,
+      children: [
+        new ImageRun({
+          data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+          transformation: { width: 80, height: 80 },
+        }),
+      ],
+    }),
+  ],
+});
+
                 const doc = new Document({
                     styles: {
                         default: { document: { run: { font: "Aptos" } } },
@@ -206,20 +220,7 @@
                             })
                         },
                         children: [
-                           new Paragraph({
-  alignment: AlignmentType.RIGHT,
-  children: [
-    new ImageRun({
-      data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-      transformation: { width: 80, height: 80 },
-    }),
-  ],
-}),
-new Paragraph({
-  text: "",
-  spacing: { before: 200, after: 400 }, // adds space (~0.4 inch total)
-}),
-
+                           
 // extra spacing below image
 
                             new Paragraph({ text: "" }),
