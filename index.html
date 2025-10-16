@@ -3,566 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <img src="efa_logo.png">
     <title>EFA Proposal Generator</title>
     
-    <!-- Load docx library from CDN -->
     <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 50px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 3px solid #1e3c72;
-        }
-        
-        .logo {
-            width: 100px;
-            height: 100px;
-            background: #1e3c72;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 36px;
-            font-weight: bold;
-        }
-        
-        h1 {
-            color: #1e3c72;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-        
-        .subtitle {
-            color: #666;
-            font-size: 16px;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        label .required {
-            color: #dc3545;
-        }
-        
-        input[type="text"],
-        input[type="number"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-        
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #1e3c72;
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
-        }
-        
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-            line-height: 1.6;
-        }
-        
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        .consultant-entry {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 5px solid #1e3c72;
-            position: relative;
-        }
-        
-        .consultant-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .consultant-header h3 {
-            color: #1e3c72;
-            font-size: 18px;
-        }
-        
-        .btn-remove {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .btn-remove:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-        
-        .btn-add {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            width: 100%;
-        }
-        
-        .btn-add:hover {
-            background: #218838;
-            transform: translateY(-2px);
-        }
-        
-        .btn-generate {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 700;
-            width: 100%;
-            margin-top: 30px;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .btn-generate:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(30, 60, 114, 0.4);
-        }
-        
-        .btn-generate:active {
-            transform: translateY(0);
-        }
-        
-        .section-title {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            margin: 40px 0 25px 0;
-            font-size: 18px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .info-box {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-left: 5px solid #2196F3;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 10px;
-            font-size: 14px;
-            color: #1565c0;
-            line-height: 1.6;
-        }
-        
-        .info-box strong {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 16px;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #1e3c72;
-            font-size: 16px;
-        }
-        
-        .loading.active {
-            display: block;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1e3c72;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            .row {
-                grid-template-columns: 1fr;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 50px; }
+        .efa-header { width: 100%; display: flex; justify-content: flex-end; align-items: center; padding: 10px 20px; box-sizing: border-box; margin-bottom: 30px; }
+        .efa-logo { width: 140px; height: auto; border-radius: 8px; object-fit: contain; }
+        h1 { color: #1e3c72; margin-bottom: 10px; font-size: 32px; }
+        .subtitle { color: #666; font-size: 16px; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 14px; }
+        label .required { color: #dc3545; }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: all 0.3s; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #1e3c72; box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1); }
+        textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .consultant-entry { background: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #1e3c72; position: relative; }
+        .consultant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .consultant-header h3 { color: #1e3c72; font-size: 18px; }
+        .btn-remove { background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.3s; }
+        .btn-remove:hover { background: #c82333; transform: translateY(-2px); }
+        .btn-add { background: #28a745; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; margin-bottom: 20px; transition: all 0.3s; width: 100%; }
+        .btn-add:hover { background: #218838; transform: translateY(-2px); }
+        .btn-generate { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border: none; padding: 18px 40px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: 700; width: 100%; margin-top: 30px; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-generate:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(30, 60, 114, 0.4); }
+        .section-title { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 15px 25px; border-radius: 10px; margin: 40px 0 25px 0; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .hidden { display: none; }
+        .info-box { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left: 5px solid #2196F3; padding: 20px; margin-bottom: 30px; border-radius: 10px; font-size: 14px; color: #1565c0; line-height: 1.6; }
+        .info-box strong { display: block; margin-bottom: 8px; font-size: 16px; }
+        .loading { display: none; text-align: center; padding: 20px; color: #1e3c72; font-size: 16px; }
+        .loading.active { display: block; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #1e3c72; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .container { padding: 30px 20px; } .row { grid-template-columns: 1fr; } h1 { font-size: 24px; } }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <!-- <div class="logo">EFA</div> -->
-            <h1>EFA Proposal Generator</h1>
-            <p class="subtitle">Professional Proposal Document System</p>
-        </div>
-        
-        <div class="info-box">
-            <strong>📋 Instructions:</strong>
-            Complete all required fields marked with <span style="color: #dc3545;">*</span>. 
-            The system will generate a professionally formatted Microsoft Word document (.docx) 
-            that matches the EFA template exactly. The document will be editable and ready to send.
-        </div>
+        <div class="efa-header"><img src="./efa_logo.png" alt="EFA Engineering Logo" class="efa-logo"></div>
+        <div class="header"><h1>EFA Proposal Generator</h1><p class="subtitle">Professional Proposal Document System</p></div>
+        <div class="info-box"><strong>📋 Instructions:</strong>Complete all required fields marked with <span style="color: #dc3545;">*</span>. The system will generate a professionally formatted Microsoft Word document (.docx) that matches the EFA template exactly.</div>
         
         <form id="proposalForm">
-            <!-- BASIC INFORMATION -->
             <div class="section-title">📋 Basic Information</div>
-            
             <div class="row">
-                <div class="form-group">
-                    <label for="name">Name and Surname <span class="required">*</span></label>
-                    <input type="text" id="name" placeholder="e.g., John Smith" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="department">Department/Directorate <span class="required">*</span></label>
-                    <input type="text" id="department" placeholder="e.g., Engineering" required>
-                </div>
+                <div class="form-group"><label for="name">Name and Surname <span class="required">*</span></label><input type="text" id="name" placeholder="e.g., John Smith" required></div>
+                <div class="form-group"><label for="department">Department/Directorate <span class="required">*</span></label><input type="text" id="department" placeholder="e.g., Engineering" required></div>
             </div>
-            
             <div class="row">
-                <div class="form-group">
-                    <label for="company">Company Name <span class="required">*</span></label>
-                    <input type="text" id="company" placeholder="e.g., ABC Corporation" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="date">Date <span class="required">*</span></label>
-                    <input type="date" id="date" required>
-                </div>
+                <div class="form-group"><label for="company">Company Name <span class="required">*</span></label><input type="text" id="company" placeholder="e.g., ABC Corporation" required></div>
+                <div class="form-group"><label for="date">Date <span class="required">*</span></label><input type="date" id="date" required></div>
             </div>
+            <div class="form-group"><label for="proposalTitle">Proposal Title <span class="required">*</span></label><input type="text" id="proposalTitle" placeholder="e.g., Infrastructure Assessment Project" required></div>
+            <div class="form-group"><label for="generalInfo">General Information and Introduction <span class="required">*</span></label><textarea id="generalInfo" placeholder="Provide an overview..." required></textarea></div>
             
-            <div class="form-group">
-                <label for="proposalTitle">Proposal Title <span class="required">*</span></label>
-                <input type="text" id="proposalTitle" placeholder="e.g., Infrastructure Assessment Project" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="generalInfo">General Information and Introduction <span class="required">*</span></label>
-                <textarea id="generalInfo" placeholder="Provide an overview of the proposal and project context..." required></textarea>
-            </div>
-            
-            <!-- PRICING INFORMATION -->
             <div class="section-title">💷 Pricing Information</div>
+            <div class="form-group"><label for="proposalType">Select Proposal Type <span class="required">*</span></label><select id="proposalType" required><option value="">-- Select Type --</option><option value="deliverables">Deliverables (Fixed Price)</option><option value="timesheets">Timesheets (Day Rate)</option></select></div>
+            <div class="form-group"><label for="finalPrice">Final Price (£) <span class="required">*</span></label><input type="number" id="finalPrice" step="0.01" min="0" placeholder="e.g., 50000.00" required></div>
             
-            <div class="form-group">
-                <label for="proposalType">Select Proposal Type <span class="required">*</span></label>
-                <select id="proposalType" required>
-                    <option value="">-- Select Type --</option>
-                    <option value="deliverables">Deliverables (Fixed Price)</option>
-                    <option value="timesheets">Timesheets (Day Rate)</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="finalPrice">Final Price (£) <span class="required">*</span></label>
-                <input type="number" id="finalPrice" step="0.01" min="0" placeholder="e.g., 50000.00" required>
-            </div>
-            
-            <!-- DELIVERABLES SECTION -->
             <div id="deliverablesSection" class="hidden">
                 <div class="row">
-                    <div class="form-group">
-                        <label for="timePeriodNumber">Number of Weeks/Months <span class="required">*</span></label>
-                        <input type="number" id="timePeriodNumber" min="1" placeholder="e.g., 12">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="timePeriodUnit">Period Unit <span class="required">*</span></label>
-                        <select id="timePeriodUnit">
-                            <option value="week">Week(s)</option>
-                            <option value="month">Month(s)</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label for="timePeriodNumber">Number of Weeks/Months <span class="required">*</span></label><input type="number" id="timePeriodNumber" min="1" placeholder="e.g., 12"></div>
+                    <div class="form-group"><label for="timePeriodUnit">Period Unit <span class="required">*</span></label><select id="timePeriodUnit"><option value="week">Week(s)</option><option value="month">Month(s)</option></select></div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="ratePerPeriod">Rate per Week/Month (£) - Auto-calculated</label>
-                    <input type="number" id="ratePerPeriod" step="0.01" readonly style="background: #f5f5f5;">
-                </div>
+                <div class="form-group"><label for="ratePerPeriod">Rate per Week/Month (£) - Auto-calculated</label><input type="number" id="ratePerPeriod" step="0.01" readonly style="background: #f5f5f5;"></div>
             </div>
             
-            <!-- TIMESHEETS SECTION -->
             <div id="timesheetsSection" class="hidden">
                 <div id="consultantsContainer"></div>
                 <button type="button" class="btn-add" onclick="addConsultant()">➕ Add Consultant</button>
             </div>
             
-            <!-- DETAILED INFORMATION -->
             <div class="section-title">📝 Detailed Information</div>
+            <div class="form-group"><label for="detailedInfo">Detailed Information <span class="required">*</span></label><textarea id="detailedInfo" placeholder="Detailed information..." required></textarea></div>
+            <div class="form-group"><label for="scope">Scope <span class="required">*</span></label><textarea id="scope" placeholder="Define the scope..." required></textarea></div>
+            <div class="form-group"><label for="deliverables">Deliverables <span class="required">*</span></label><textarea id="deliverables" placeholder="List deliverables..." required></textarea></div>
+            <div class="form-group"><label for="resources">Resources <span class="required">*</span></label><textarea id="resources" placeholder="Describe resources..." required></textarea></div>
             
-            <div class="form-group">
-                <label for="detailedInfo">Detailed Information <span class="required">*</span></label>
-                <textarea id="detailedInfo" placeholder="Detailed information regarding the proposed work analysed following meetings or discussions with clients..." required></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="scope">Scope <span class="required">*</span></label>
-                <textarea id="scope" placeholder="Define the scope of work..." required></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="deliverables">Deliverables <span class="required">*</span></label>
-                <textarea id="deliverables" placeholder="List the deliverables..." required></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="resources">Resources <span class="required">*</span></label>
-                <textarea id="resources" placeholder="Describe the resources required..." required></textarea>
-            </div>
-            
-            <!-- DURATION -->
             <div class="section-title">📅 Duration</div>
-            
-            <div class="form-group">
-                <label for="duration">Duration <span class="required">*</span></label>
-                <input type="text" id="duration" placeholder='e.g., "4 weeks" or "6 months"' required>
-            </div>
-            
+            <div class="form-group"><label for="duration">Duration <span class="required">*</span></label><input type="text" id="duration" placeholder='e.g., "4 weeks"' required></div>
             <div class="row">
-                <div class="form-group">
-                    <label for="startDate">Starting Date <span class="required">*</span></label>
-                    <input type="date" id="startDate" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="endDate">Ending Date <span class="required">*</span></label>
-                    <input type="date" id="endDate" required>
-                </div>
+                <div class="form-group"><label for="startDate">Starting Date <span class="required">*</span></label><input type="date" id="startDate" required></div>
+                <div class="form-group"><label for="endDate">Ending Date <span class="required">*</span></label><input type="date" id="endDate" required></div>
             </div>
             
-            <!-- COMMERCIAL TERMS -->
             <div class="section-title">📄 Commercial Terms</div>
+            <div class="form-group"><label for="contractType">Contract Type <span class="required">*</span></label><select id="contractType" required><option value="">-- Select Contract Type --</option><option value="NR26">NR26: Professional Service Short Contract (PSSC)</option><option value="NEC4">NEC4: Professional Service Short Contract</option><option value="NR3">NR3: Contract</option><option value="PSR:SOW">PSR:SOW Framework</option></select></div>
             
-            <div class="form-group">
-                <label for="contractType">Contract Type <span class="required">*</span></label>
-                <select id="contractType" required>
-                    <option value="">-- Select Contract Type --</option>
-                    <option value="NR26">NR26: Professional Service Short Contract (PSSC)</option>
-                    <option value="NEC4">NEC4: Professional Service Short Contract</option>
-                    <option value="NR3">NR3: Contract</option>
-                    <option value="PSR:SOW">PSR:SOW Framework</option>
-                </select>
-            </div>
-            
-            <div class="loading" id="loadingIndicator">
-                <div class="spinner"></div>
-                <p>Generating your professional Word document...</p>
-            </div>
-            
+            <div class="loading" id="loadingIndicator"><div class="spinner"></div><p>Generating your professional Word document...</p></div>
             <button type="submit" class="btn-generate">📥 Generate Word Document (.docx)</button>
         </form>
     </div>
 
     <script>
-        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle, HeadingLevel } = docx;
-        
+        const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle, Footer, ImageRun } = docx;
         let consultantCount = 0;
-        
-        // Set today's date as default
         document.getElementById('date').valueAsDate = new Date();
         
-        // Handle proposal type change
         document.getElementById('proposalType').addEventListener('change', function() {
-            const deliverablesSection = document.getElementById('deliverablesSection');
-            const timesheetsSection = document.getElementById('timesheetsSection');
-            
-            if (this.value === 'deliverables') {
-                deliverablesSection.classList.remove('hidden');
-                timesheetsSection.classList.add('hidden');
-                calculateRate();
-            } else if (this.value === 'timesheets') {
-                deliverablesSection.classList.add('hidden');
-                timesheetsSection.classList.remove('hidden');
-            } else {
-                deliverablesSection.classList.add('hidden');
-                timesheetsSection.classList.add('hidden');
-            }
+            const d = document.getElementById('deliverablesSection'), t = document.getElementById('timesheetsSection');
+            if (this.value === 'deliverables') { d.classList.remove('hidden'); t.classList.add('hidden'); calculateRate(); }
+            else if (this.value === 'timesheets') { d.classList.add('hidden'); t.classList.remove('hidden'); }
+            else { d.classList.add('hidden'); t.classList.add('hidden'); }
         });
         
-        // Auto-calculate rate per period
         document.getElementById('finalPrice').addEventListener('input', calculateRate);
         document.getElementById('timePeriodNumber').addEventListener('input', calculateRate);
         
         function calculateRate() {
-            const proposalType = document.getElementById('proposalType').value;
-            if (proposalType === 'deliverables') {
-                const price = parseFloat(document.getElementById('finalPrice').value) || 0;
-                const periods = parseFloat(document.getElementById('timePeriodNumber').value) || 1;
-                const rate = price / periods;
-                document.getElementById('ratePerPeriod').value = rate.toFixed(2);
+            if (document.getElementById('proposalType').value === 'deliverables') {
+                const p = parseFloat(document.getElementById('finalPrice').value) || 0;
+                const n = parseFloat(document.getElementById('timePeriodNumber').value) || 1;
+                document.getElementById('ratePerPeriod').value = (p / n).toFixed(2);
             }
         }
         
         function addConsultant() {
             consultantCount++;
-            const container = document.getElementById('consultantsContainer');
-            const consultantDiv = document.createElement('div');
-            consultantDiv.className = 'consultant-entry';
-            consultantDiv.id = `consultant-${consultantCount}`;
-            consultantDiv.innerHTML = `
-                <div class="consultant-header">
-                    <h3>Consultant ${consultantCount}</h3>
-                    <button type="button" class="btn-remove" onclick="removeConsultant(${consultantCount})">✕ Remove</button>
-                </div>
-                <div class="form-group">
-                    <label>Job Title <span class="required">*</span></label>
-                    <input type="text" name="jobTitle-${consultantCount}" placeholder="e.g., Senior Engineer" required>
-                </div>
-                <div class="row">
-                    <div class="form-group">
-                        <label>Charge Rate (£) <span class="required">*</span></label>
-                        <input type="number" name="chargeRate-${consultantCount}" step="0.01" min="0" placeholder="e.g., 850.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Total Shifts <span class="required">*</span></label>
-                        <input type="number" name="totalShifts-${consultantCount}" min="1" placeholder="e.g., 20" required>
-                    </div>
-                </div>
-            `;
-            container.appendChild(consultantDiv);
+            const c = document.getElementById('consultantsContainer'), d = document.createElement('div');
+            d.className = 'consultant-entry'; d.id = `consultant-${consultantCount}`;
+            d.innerHTML = `<div class="consultant-header"><h3>Consultant ${consultantCount}</h3><button type="button" class="btn-remove" onclick="removeConsultant(${consultantCount})">✕ Remove</button></div><div class="form-group"><label>Job Title <span class="required">*</span></label><input type="text" name="jobTitle-${consultantCount}" placeholder="e.g., Senior Engineer" required></div><div class="row"><div class="form-group"><label>Charge Rate (£) <span class="required">*</span></label><input type="number" name="chargeRate-${consultantCount}" step="0.01" min="0" placeholder="e.g., 850.00" required></div><div class="form-group"><label>Total Shifts <span class="required">*</span></label><input type="number" name="totalShifts-${consultantCount}" min="1" placeholder="e.g., 20" required></div></div>`;
+            c.appendChild(d);
         }
         
-        function removeConsultant(id) {
-            const element = document.getElementById(`consultant-${id}`);
-            if (element) {
-                element.remove();
-            }
-        }
+        function removeConsultant(id) { const e = document.getElementById(`consultant-${id}`); if (e) e.remove(); }
         
         function numberToWords(num) {
             const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
             const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
             const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-            
             if (num === 0) return 'Zero';
-            
             function convertChunk(n) {
                 let str = '';
-                if (n >= 100) {
-                    str += ones[Math.floor(n / 100)] + ' Hundred ';
-                    n %= 100;
-                }
-                if (n >= 20) {
-                    str += tens[Math.floor(n / 10)] + ' ';
-                    n %= 10;
-                } else if (n >= 10) {
-                    str += teens[n - 10] + ' ';
-                    return str.trim();
-                }
-                if (n > 0) {
-                    str += ones[n] + ' ';
-                }
+                if (n >= 100) { str += ones[Math.floor(n / 100)] + ' Hundred '; n %= 100; }
+                if (n >= 20) { str += tens[Math.floor(n / 10)] + ' '; n %= 10; }
+                else if (n >= 10) { str += teens[n - 10] + ' '; return str.trim(); }
+                if (n > 0) str += ones[n] + ' ';
                 return str.trim();
             }
-            
             let result = '';
-            if (num >= 1000000) {
-                result += convertChunk(Math.floor(num / 1000000)) + ' Million ';
-                num %= 1000000;
-            }
-            if (num >= 1000) {
-                result += convertChunk(Math.floor(num / 1000)) + ' Thousand ';
-                num %= 1000;
-            }
+            if (num >= 1000000) { result += convertChunk(Math.floor(num / 1000000)) + ' Million '; num %= 1000000; }
+            if (num >= 1000) { result += convertChunk(Math.floor(num / 1000)) + ' Thousand '; num %= 1000; }
             result += convertChunk(num);
-            
             return result.trim();
         }
         
         function priceToWords(price) {
-            const pounds = Math.floor(price);
-            const pence = Math.round((price - pounds) * 100);
-            
+            const pounds = Math.floor(price), pence = Math.round((price - pounds) * 100);
             let result = numberToWords(pounds) + ' Pounds';
-            
-            if (pence > 0) {
-                result += ' and ' + numberToWords(pence) + ' Pence';
-            }
-            
+            if (pence > 0) result += ' and ' + numberToWords(pence) + ' Pence';
             return result;
         }
         
@@ -576,227 +170,89 @@
             return contracts[contractType] || '';
         }
         
+        async function getBase64Image(url) {
+            const response = await fetch(url), blob = await response.blob();
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+        
+        function textToParagraphs(text) {
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+            return lines.map(line => new Paragraph({ text: line.trim(), style: 'Normal' }));
+        }
+
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
             try {
+                const logoBase64 = await getBase64Image("./efa_logo.png");
                 const doc = new Document({
+                    styles: {
+                        default: { document: { run: { font: "Aptos" } } },
+                        paragraphStyles: [{ id: "Normal", name: "Normal", run: { font: "Aptos", size: 22 }, paragraph: { spacing: { line: 276, before: 0, after: 120 } } }]
+                    },
                     sections: [{
-                        properties: {
-                            page: {
-                                margin: {
-                                    top: 720,
-                                    right: 1080,
-                                    bottom: 720,
-                                    left: 1080,
-                                },
-                            },
+                        properties: { page: { margin: { top: 720, right: 1080, bottom: 720, left: 1080 } } },
+                        footers: {
+                            default: new Footer({
+                                children: [
+                                    new Paragraph({ children: [new TextRun({ text: "EFA Engineering Limited", font: "Aptos", size: 18 })], alignment: AlignmentType.CENTER }),
+                                    new Paragraph({ children: [new TextRun({ text: "Registered Office: 128 City Road, London, United Kingdom, EC1V 2NX", font: "Aptos", size: 18 })], alignment: AlignmentType.CENTER }),
+                                    new Paragraph({ children: [new TextRun({ text: "T: +44 (0)7734 146510", font: "Aptos", size: 18 })], alignment: AlignmentType.CENTER }),
+                                    new Paragraph({ children: [new TextRun({ text: "Registered in England no. 08608392", font: "Aptos", size: 18 })], alignment: AlignmentType.CENTER })
+                                ]
+                            })
                         },
                         children: [
-                            // Header Table
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                width: { size: 30, type: WidthType.PERCENTAGE },
-                                                children: [new Paragraph({ text: "Document Ref. No." })],
-                                            }),
-                                            new TableCell({
-                                                width: { size: 70, type: WidthType.PERCENTAGE },
-                                                children: [new Paragraph({ text: "" })],
-                                            }),
-                                        ],
-                                    }),
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({ children: [new Paragraph({ text: "Revision" })] }),
-                                            new TableCell({ children: [new Paragraph({ text: "" })] }),
-                                        ],
-                                    }),
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({ children: [new Paragraph({ text: "Date" })] }),
-                                            new TableCell({ children: [new Paragraph({ text: "" })] }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            
+                            new Paragraph({ children: [new ImageRun({ data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)), transformation: { width: 120, height: 120 }, floating: { horizontalPosition: { align: "right" }, verticalPosition: { offset: 0 } } })], alignment: AlignmentType.RIGHT }),
                             new Paragraph({ text: "" }),
-                            
-                            new Paragraph({
-                                text: "Private and Confidential",
-                                alignment: AlignmentType.RIGHT,
-                            }),
-                            
+                            new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ width: { size: 30, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "Document Ref. No.", style: "Normal" })] }), new TableCell({ width: { size: 70, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "", style: "Normal" })] })] }), new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: "Revision", style: "Normal" })] }), new TableCell({ children: [new Paragraph({ text: "", style: "Normal" })] })] }), new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: "Date", style: "Normal" })] }), new TableCell({ children: [new Paragraph({ text: "", style: "Normal" })] })] })] }),
                             new Paragraph({ text: "" }),
-                            new Paragraph({ text: `FAO: ${formData.name}` }),
-                            new Paragraph({ text: formData.department }),
-                            new Paragraph({ text: formData.company }),
+                            new Paragraph({ text: "Private and Confidential", alignment: AlignmentType.RIGHT, style: "Normal" }),
                             new Paragraph({ text: "" }),
-                            new Paragraph({ text: formData.date }),
+                            new Paragraph({ text: `FAO: ${formData.name}`, style: "Normal" }),
+                            new Paragraph({ text: formData.department, style: "Normal" }),
+                            new Paragraph({ text: formData.company, style: "Normal" }),
                             new Paragraph({ text: "" }),
-                            new Paragraph({ text: "Private and Confidential" }),
+                            new Paragraph({ text: formData.date, style: "Normal" }),
                             new Paragraph({ text: "" }),
-                            new Paragraph({ text: `Dear ${formData.name},` }),
+                            new Paragraph({ text: "Private and Confidential", style: "Normal" }),
                             new Paragraph({ text: "" }),
-                            
-                            new Paragraph({
-                                children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true })],
-                            }),
-                            
+                            new Paragraph({ text: `Dear ${formData.name},`, style: "Normal" }),
                             new Paragraph({ text: "" }),
-                            
-                            // Content Box 1 with border
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                    new Paragraph({ text: formData.generalInfo }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: `Our price for the work is £${formData.finalPrice.toFixed(2)} (${priceInWords}). Excluding VAT.` }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: pricingText }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: "Please see full details of scope and deliverables on the following pages:" }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            
+                            new Paragraph({ children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true, font: "Aptos" })], style: "Normal" }),
                             new Paragraph({ text: "" }),
-                            
-                            // Content Box 2 with border
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                    new Paragraph({ text: formData.detailedInfo }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Scope", bold: true })] }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: formData.scope }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true })] }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: formData.deliverables }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ children: [new TextRun({ text: "Resources", bold: true })] }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: formData.resources }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            
+                            new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ children: [...textToParagraphs(formData.generalInfo), new Paragraph({ text: "" }), new Paragraph({ text: `Our price for the work is £${formData.finalPrice.toFixed(2)} (${priceInWords}). Excluding VAT.`, style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: pricingText, style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: "Please see full details of scope and deliverables on the following pages:", style: "Normal" })] })] })] }),
                             new Paragraph({ text: "" }),
-                            
-                            // Duration Box
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                    new Paragraph({ children: [new TextRun({ text: "DURATION", bold: true })] }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: `The duration of the work is ${formData.duration}, commencing on ${formData.startDate} and concluding on ${formData.endDate}. The project will be billed periodically with the payment application being supported by an up-to-date delivery programme.` }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            
+                            new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ children: [...textToParagraphs(formData.detailedInfo), new Paragraph({ text: "" }), new Paragraph({ children: [new TextRun({ text: "Scope", bold: true, font: "Aptos" })], style: "Normal" }), new Paragraph({ text: "" }), ...textToParagraphs(formData.scope), new Paragraph({ text: "" }), new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true, font: "Aptos" })], style: "Normal" }), new Paragraph({ text: "" }), ...textToParagraphs(formData.deliverables), new Paragraph({ text: "" }), new Paragraph({ children: [new TextRun({ text: "Resources", bold: true, font: "Aptos" })], style: "Normal" }), new Paragraph({ text: "" }), ...textToParagraphs(formData.resources)] })] })] }),
                             new Paragraph({ text: "" }),
-                            
-                            // Commercial Box
-                            new Table({
-                                width: { size: 100, type: WidthType.PERCENTAGE },
-                                borders: {
-                                    top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                    right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [
-                                                                                                        new Paragraph({ text: formData.contractType }),
-                                                    new Paragraph({ text: "" }),
-                                                    new Paragraph({ text: contractText }),
-                                                ],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-
+                            new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "DURATION", bold: true, font: "Aptos" })], style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: `The duration of the work is ${formData.duration}, commencing on ${formData.startDate} and concluding on ${formData.endDate}. The project will be billed periodically with the payment application being supported by an up-to-date delivery programme.`, style: "Normal" })] })] })] }),
                             new Paragraph({ text: "" }),
-                            new Paragraph({ text: "Yours sincerely," }),
+                            new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: formData.contractType, style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: contractText, style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: "The law of the contract is the Law of England and Wales.", style: "Normal" }), new Paragraph({ children: [new TextRun({ text: "The assessment day", italics: true, font: "Aptos" }), new TextRun({ text: " is within 28 days from the ", font: "Aptos" }), new TextRun({ text: "starting date", italics: true, font: "Aptos" }), new TextRun({ text: ".", font: "Aptos" })], style: "Normal" })] })] })] }),
                             new Paragraph({ text: "" }),
-                            new Paragraph({ text: formData.name }),
-                            new Paragraph({ text: formData.department }),
-                            new Paragraph({ text: formData.company }),
-                        ],
-                    }],
+                            new Paragraph({ text: "Yours sincerely,", style: "Normal" }),
+                            new Paragraph({ text: "" }),
+                            new Paragraph({ text: formData.name, style: "Normal" }),
+                            new Paragraph({ text: formData.department, style: "Normal" }),
+                            new Paragraph({ text: formData.company, style: "Normal" })
+                        ]
+                    }]
                 });
-
                 const blob = await Packer.toBlob(doc);
                 saveAs(blob, `${formData.proposalTitle.replace(/\s+/g, '_')}_Proposal.docx`);
             } catch (error) {
-                console.error("Error generating Word document:", error);
-                alert("❌ Something went wrong while generating the Word document. Please try again.");
+                console.error("Error:", error);
+                alert("❌ Something went wrong. Please try again.");
             } finally {
                 document.getElementById('loadingIndicator').classList.remove('active');
             }
         }
 
-        // Handle form submission
         document.getElementById('proposalForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-
             document.getElementById('loadingIndicator').classList.add('active');
-
             const formData = {
                 name: document.getElementById('name').value.trim(),
                 department: document.getElementById('department').value.trim(),
@@ -813,9 +269,9 @@
                 duration: document.getElementById('duration').value.trim(),
                 startDate: document.getElementById('startDate').value,
                 endDate: document.getElementById('endDate').value,
-                contractType: document.getElementById('contractType').value
+                contractType: document.getElementById('contractType').value,
+                timePeriodNumber: document.getElementById('timePeriodNumber').value
             };
-
             let pricingText = '';
             if (formData.proposalType === 'deliverables') {
                 const rate = document.getElementById('ratePerPeriod').value;
@@ -831,10 +287,8 @@
                 });
                 pricingText = `This proposal is based on a timesheet arrangement including: ${consultants.join('; ')}.`;
             }
-
             const priceInWords = priceToWords(formData.finalPrice);
             const contractText = getContractText(formData.contractType);
-
             await generateWordDocument(formData, pricingText, priceInWords, contractText);
         });
     </script>
