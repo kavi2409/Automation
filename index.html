@@ -189,57 +189,95 @@
             try {
                 const logoBase64 = await getBase64Image("./efa_logo.png");
                 const header = new docx.Header({
-  children: [
-    new Paragraph({
-      alignment: AlignmentType.RIGHT,
-      children: [
-        new ImageRun({
-          data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
-          transformation: { width: 80, height: 80 },
-        }),
-      ],
-    }),
-  ],
-});
+            children: [
+                new docx.Paragraph({
+                    alignment: docx.AlignmentType.RIGHT,
+                    children: [
+                        new docx.ImageRun({
+                            data: Uint8Array.from(atob(logoBase64), c => c.charCodeAt(0)),
+                            transformation: { width: 80, height: 80 },
+                        }),
+                    ],
+                }),
+            ],
+        });
 
-                const doc = new Document({
-                    styles: {
-                        default: { document: { run: { font: "Aptos" } } },
-                        paragraphStyles: [{ id: "Normal", name: "Normal", run: { font: "Aptos", size: 22 }, paragraph: { spacing: { line: 276, before: 0, after: 120 } } }]
-                    },
-                    sections: [{
-                        properties: { page: { margin: { top: 720, right: 1080, bottom: 720, left: 1080 } } },
-                        footers: {
-                            default: new Footer({
+        const doc = new docx.Document({
+            styles: {
+                default: { document: { run: { font: "Aptos" } } },
+                paragraphStyles: [{
+                    id: "Normal",
+                    name: "Normal",
+                    run: { font: "Aptos", size: 22 },
+                    paragraph: { spacing: { line: 276, before: 0, after: 120 } }
+                }]
+            },
+            sections: [{
+                properties: {
+                    page: { margin: { top: 720, right: 1080, bottom: 720, left: 1080 } }
+                },
+                headers: {
+                    default: header // assign the logo header here
+                },
+                footers: {
+                    default: new docx.Footer({
+                        children: [
+                            new docx.Paragraph({ children: [new docx.TextRun({ text: "EFA Engineering Limited", font: "Aptos", size: 18 })], alignment: docx.AlignmentType.CENTER }),
+                            new docx.Paragraph({ children: [new docx.TextRun({ text: "Registered Office: 128 City Road, London, United Kingdom, EC1V 2NX", font: "Aptos", size: 18 })], alignment: docx.AlignmentType.CENTER }),
+                            new docx.Paragraph({ children: [new docx.TextRun({ text: "T: +44 (0)7734 146510", font: "Aptos", size: 18 })], alignment: docx.AlignmentType.CENTER }),
+                            new docx.Paragraph({ children: [new docx.TextRun({ text: "Registered in England no. 08608392", font: "Aptos", size: 18 })], alignment: docx.AlignmentType.CENTER })
+                        ]
+                    })
+                },
+                children: [
+                    new docx.Paragraph({ text: "" }), // optional spacing
+                    new docx.Table({
+                        width: { size: 100, type: docx.WidthType.PERCENTAGE },
+                        borders: {
+                            top: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+                            bottom: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+                            left: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+                            right: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+                            insideHorizontal: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" },
+                            insideVertical: { style: docx.BorderStyle.SINGLE, size: 6, color: "000000" }
+                        },
+                        rows: [
+                            new docx.TableRow({
                                 children: [
-                                    new Paragraph({ children: [new TextRun({ text: "EFA Engineering Limited", font: "Aptos", size: 18 })], alignment: AlignmentType.CENTER }),
-                                    new Paragraph({ children: [new TextRun({ text: "Registered Office: 128 City Road, London, United Kingdom, EC1V 2NX", font: "Aptos", size: 18 })], alignment: AlignmentType.CENTER }),
-                                    new Paragraph({ children: [new TextRun({ text: "T: +44 (0)7734 146510", font: "Aptos", size: 18 })], alignment: AlignmentType.CENTER }),
-                                    new Paragraph({ children: [new TextRun({ text: "Registered in England no. 08608392", font: "Aptos", size: 18 })], alignment: AlignmentType.CENTER })
+                                    new docx.TableCell({ width: { size: 30, type: docx.WidthType.PERCENTAGE }, children: [new docx.Paragraph({ text: "Document Ref. No.", style: "Normal" })] }),
+                                    new docx.TableCell({ width: { size: 70, type: docx.WidthType.PERCENTAGE }, children: [new docx.Paragraph({ text: "", style: "Normal" })] })
+                                ]
+                            }),
+                            new docx.TableRow({
+                                children: [
+                                    new docx.TableCell({ children: [new docx.Paragraph({ text: "Revision", style: "Normal" })] }),
+                                    new docx.TableCell({ children: [new docx.Paragraph({ text: "", style: "Normal" })] })
+                                ]
+                            }),
+                            new docx.TableRow({
+                                children: [
+                                    new docx.TableCell({ children: [new docx.Paragraph({ text: "Date", style: "Normal" })] }),
+                                    new docx.TableCell({ children: [new docx.Paragraph({ text: "", style: "Normal" })] })
                                 ]
                             })
-                        },
-                        children: [
-                           
-// extra spacing below image
-
-                            new Paragraph({ text: "" }),
-                            new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ width: { size: 30, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "Document Ref. No.", style: "Normal" })] }), new TableCell({ width: { size: 70, type: WidthType.PERCENTAGE }, children: [new Paragraph({ text: "", style: "Normal" })] })] }), new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: "Revision", style: "Normal" })] }), new TableCell({ children: [new Paragraph({ text: "", style: "Normal" })] })] }), new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: "Date", style: "Normal" })] }), new TableCell({ children: [new Paragraph({ text: "", style: "Normal" })] })] })] }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: "Private and Confidential", alignment: AlignmentType.RIGHT, style: "Normal" }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: `FAO: ${formData.name}`, style: "Normal" }),
-                            new Paragraph({ text: formData.department, style: "Normal" }),
-                            new Paragraph({ text: formData.company, style: "Normal" }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: formData.date, style: "Normal" }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: "Private and Confidential", style: "Normal" }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ text: `Dear ${formData.name},`, style: "Normal" }),
-                            new Paragraph({ text: "" }),
-                            new Paragraph({ children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true, font: "Aptos" })], style: "Normal" }),
-                            new Paragraph({ text: "" }),
+                        ]
+                    }),
+                    new docx.Paragraph({ text: "" }),
+                    new docx.Paragraph({ text: "Private and Confidential", alignment: docx.AlignmentType.RIGHT, style: "Normal" }),
+                    new docx.Paragraph({ text: "" }),
+                    new docx.Paragraph({ text: `FAO: ${formData.name}`, style: "Normal" }),
+                    new docx.Paragraph({ text: formData.department, style: "Normal" }),
+                    new docx.Paragraph({ text: formData.company, style: "Normal" }),
+                    new docx.Paragraph({ text: "" }),
+                    new docx.Paragraph({ text: formData.date, style: "Normal" }),
+                    new docx.Paragraph({ text: "" }),
+                    new docx.Paragraph({ text: "Private and Confidential", style: "Normal" }),
+                    new docx.Paragraph({ text: "" }),
+                    new docx.Paragraph({ text: `Dear ${formData.name},`, style: "Normal" }),
+                    new docx.Paragraph({ text: "" }),
+                    new docx.Paragraph({ children: [new docx.TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true, font: "Aptos" })], style: "Normal" }),
+                    new docx.Paragraph({ text: "" }),
+                    new Paragraph({ text: "" }),
                             new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ children: [...textToParagraphs(formData.generalInfo), new Paragraph({ text: "" }), new Paragraph({ text: `Our price for the work is £${formData.finalPrice.toFixed(2)} (${priceInWords}). Excluding VAT.`, style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: pricingText, style: "Normal" }), new Paragraph({ text: "" }), new Paragraph({ text: "Please see full details of scope and deliverables on the following pages:", style: "Normal" })] })] })] }),
                             new Paragraph({ text: "" }),
                             new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, borders: { top: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, left: { style: BorderStyle.SINGLE, size: 6, color: "000000" }, right: { style: BorderStyle.SINGLE, size: 6, color: "000000" } }, rows: [new TableRow({ children: [new TableCell({ children: [...textToParagraphs(formData.detailedInfo), new Paragraph({ text: "" }), new Paragraph({ children: [new TextRun({ text: "Scope", bold: true, font: "Aptos" })], style: "Normal" }), new Paragraph({ text: "" }), ...textToParagraphs(formData.scope), new Paragraph({ text: "" }), new Paragraph({ children: [new TextRun({ text: "Deliverables", bold: true, font: "Aptos" })], style: "Normal" }), new Paragraph({ text: "" }), ...textToParagraphs(formData.deliverables), new Paragraph({ text: "" }), new Paragraph({ children: [new TextRun({ text: "Resources", bold: true, font: "Aptos" })], style: "Normal" }), new Paragraph({ text: "" }), ...textToParagraphs(formData.resources)] })] })] }),
@@ -253,18 +291,23 @@
                             new Paragraph({ text: formData.name, style: "Normal" }),
                             new Paragraph({ text: formData.department, style: "Normal" }),
                             new Paragraph({ text: formData.company, style: "Normal" })
-                        ]
-                    }]
-                });
-                const blob = await Packer.toBlob(doc);
-                saveAs(blob, `${formData.proposalTitle.replace(/\s+/g, '_')}_Proposal.docx`);
-            } catch (error) {
-                console.error("Error:", error);
-                alert("❌ Something went wrong. Please try again.");
-            } finally {
-                document.getElementById('loadingIndicator').classList.remove('active');
-            }
-        }
+
+                    // ... include all your existing tables and paragraphs here as in your code
+                    // This keeps the detailed info, scope, deliverables, resources, duration, contract, and "Yours sincerely" section intact
+                ]
+            }]
+        });
+
+        const blob = await docx.Packer.toBlob(doc);
+        saveAs(blob, `${formData.proposalTitle.replace(/\s+/g, '_')}_Proposal.docx`);
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Something went wrong. Please try again.");
+    } finally {
+        document.getElementById('loadingIndicator').classList.remove('active');
+    }
+}
 
         document.getElementById('proposalForm').addEventListener('submit', async function (e) {
             e.preventDefault();
