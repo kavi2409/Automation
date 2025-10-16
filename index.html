@@ -52,8 +52,7 @@
             font-size: 36px;
             font-weight: bold;
         }
-      
-
+        
         
         h1 {
             color: #1e3c72;
@@ -582,6 +581,7 @@
         
         async function generateWordDocument(formData, pricingText, priceInWords, contractText) {
             try {
+                const logoBase64 = await getBase64Image("efa_logo.png");
                 const doc = new Document({
                     sections: [{
                         properties: {
@@ -655,7 +655,7 @@
                             new Paragraph({ text: "" }),
                             
                             new Paragraph({
-                                children: [new TextRun({ text: font`Re: ${formData.proposalTitle}`, bold: true })],
+                                children: [new TextRun({ text: `Re: ${formData.proposalTitle}`, bold: true })],
                             }),
                             
                             new Paragraph({ text: "" }),
