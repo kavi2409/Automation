@@ -594,33 +594,19 @@
         const logoBase64 = await getBase64Image("./efa_logo.png");
 
         const doc = new Document({
-    styles: {
-        default: {
-            document: {
-                run: {
-                    font: "Aptos",
-                },
-                paragraph: {
-                    spacing: { after: 120 },
-                },
-            },
-        },
-    },
-    sections: [{
-        properties: {
-            page: {
-                margin: {
-                    top: 720,
-                    right: 1080,
-                    bottom: 720,
-                    left: 1080,
-                },
-            },
-        },
+            sections: [{
+                        properties: {
+                            page: {
+                                margin: {
+                                    top: 720,
+                                    right: 1080,
+                                    bottom: 720,
+                                    left: 1080,
+                                },
+                            },
+                        },
 children: [
     // --- Logo at top-right ---
-    
-// --- Logo at top-right ---
     new Paragraph({
     children: [
         new docx.ImageRun({
@@ -665,9 +651,6 @@ children: [
 //         }),
 //     ],
 // }),
-new Paragraph({ text: "" }), // spacing
-
-// --- Combined Header: Metadata Table + Logo ---
 new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     borders: {
@@ -681,7 +664,7 @@ new Table({
     rows: [
         new TableRow({
             children: [
-                // Left Cell: Metadata Table
+                // Left: Metadata Table
                 new TableCell({
                     width: { size: 60, type: WidthType.PERCENTAGE },
                     verticalAlign: VerticalAlign.CENTER,
@@ -689,12 +672,12 @@ new Table({
                         new Table({
                             width: { size: 100, type: WidthType.PERCENTAGE },
                             borders: {
-                                top: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                bottom: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                left: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                right: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
-                                insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "000000" },
+                                top: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
+                                bottom: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
+                                left: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
+                                right: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
+                                insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
+                                insideVertical: { style: BorderStyle.SINGLE, size: 4, color: "000000" },
                             },
                             rows: [
                                 new TableRow({
@@ -720,7 +703,7 @@ new Table({
                     ],
                 }),
 
-                // Right Cell: Logo
+                // Right: Logo
                 new TableCell({
                     width: { size: 40, type: WidthType.PERCENTAGE },
                     verticalAlign: VerticalAlign.CENTER,
@@ -739,6 +722,15 @@ new Table({
             ],
         }),
     ],
+}),
+new Paragraph({
+    children: [
+        new TextRun({
+            text: "―".repeat(50), // horizontal line
+            bold: true,
+        }),
+    ],
+    alignment: AlignmentType.CENTER,
 }),
 
 
